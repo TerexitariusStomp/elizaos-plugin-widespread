@@ -1,0 +1,12 @@
+{
+  "name": "elizaos-plugin-widespread",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Widespread verified-work protocol: discover escrowed bounties and work markets, claim funded work, get paid on verifiable output.",
+  "main": "./src/index.js",
+  "exports": { ".": "./src/index.js", "./package.json": "./package.json" },
+  "keywords": ["elizaos-plugin", "elizaos", "widespread", "mcp", "bounties", "agent-labor", "escrow"],
+  "license": "MIT",
+  "repository": "https://github.com/TerexitariusStomp/elizaos-plugin-widespread",
+  "peerDependencies": { "@elizaos/core": ">=1.0.0" }
+}
