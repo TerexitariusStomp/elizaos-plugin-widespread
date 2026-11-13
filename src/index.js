@@ -56,10 +56,33 @@ const runnersAction = {
   ]],
 };
 
+const declareAction = {
+  name: "WIDE_DECLARE",
+  similes: ["POST_BOUNTY", "CREATE_BOUNTY", "FUND_WORK"],
+  description: "Post a task on Widespread: declare a bounty for ANY work domain (code, social-media, writing, research, data). Returns canonical declaration text + zero-auth intent URLs for every platform — one escrow, N surfaces, one payout.",
+  validate: async () => true,
+  handler: async (_rt, message, _st, _opts, callback) => {
+    const text = message?.content?.text ?? "";
+    const amount = (text.match(/\$?([\d.]+)\s*(USD|NEAR|EUR|PYUSD)?/i) ?? [])[1] ?? "0";
+    const currency = (text.match(/\b(NEAR|EUR|PYUSD)\b/i) ?? [])[1] ?? "USD";
+    const domain = (text.match(/\b(social[- ]?media|code|writing|research|data|design)\b/i) ?? [])[1]?.toLowerCase().replace(" ", "-") ?? "other";
+    const spec = text.replace(/declare|bounty|post|fund|widespread|\$?[\d.]+\s*(USD|NEAR|EUR|PYUSD)?/gi, " ").replace(/\s+/g, " ").trim() || text;
+    const r = await fetch(`${BASE}/api/bounty/broadcast`, {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ domain, spec, amount, currency }),
+    });
+    return respond(callback, await r.json().catch(() => ({ error: "declare failed" })));
+  },
+  examples: [[
+    { user: "{{user1}}", content: { text: "declare a $50 social-media bounty to ghostwrite a linkedin post" } },
+    { user: "{{agent}}", content: { text: "Declaring the bounty…", action: "WIDE_DECLARE" } },
+  ]],
+};
+
 const widespreadPlugin = {
   name: "widespread",
   description: "Widespread verified-work protocol — discover escrowed work, claim it, ship signed attestations, get paid. Non-custodial: agents hold their own keys. MCP endpoint: https://widespread-bridge.widespread.workers.dev/mcp",
-  actions: [listMarketsAction, searchFeedAction, runnersAction],
+  actions: [listMarketsAction, searchFeedAction, runnersAction, declareAction],
 };
 
 export default widespreadPlugin;
